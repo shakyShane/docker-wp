@@ -1,16 +1,30 @@
 version: "2"
 
 services:
+
+# The Database
+  database:
+    image: mysql:5.7
+    volumes:
+      - ./data:/docker-entrypoint-initdb.d
+    environment:
+      - MYSQL_DATABASE=wp
+      - MYSQL_USER=admin
+      - MYSQL_PASSWORD=password
+      - MYSQL_ROOT_PASSWORD=password
+
   php:
     build:
       context: ./
       dockerfile: ./php/php.Dockerfile
     volumes:
-      - ./.env.example:/var/www/bedrock/.env
-      - ./web/app/themes:/var/www/bedrock/web/app/themes
-      - ./config:/var/www/bedrock/config
-    depends_on:
-      - database
+      - ./.env.example:/var/www/.env
+      - ./web/app/themes:/var/www/web/app/themes
+      - ./web/app/mu-plugins/bedrock-autoloader.php:/var/www/web/app/mu-plugins/bedrock-autoloader.php
+      - ./web/app/mu-plugins/disallow-indexing.php:/var/www/web/app/mu-plugins/disallow-indexing.php/
+      - ./web/app/mu-plugins/register-theme-directory.php:/var/www/web/app/mu-plugins/register-theme-directory.php
+      - ./web/app/languages:/var/www/web/app/languages
+      - ./config:/var/www/config
 
   nginx:
     image: nginx:1.12-alpine
@@ -19,15 +33,7 @@ services:
     volumes_from:
       - php
     ports:
-      - 8900:80
-
-  # The Database
-  database:
-    image: mysql:5.7
-    volumes:
-      - ./db:/var/lib/mysql
-    environment:
-      - "MYSQL_DATABASE=wp"
-      - "MYSQL_USER=root"
-      - "MYSQL_PASSWORD=secret"
-      - "MYSQL_ROOT_PASSWORD=secret"
+      - 80:80
+#
+#volumes:
+#  db-data2:
