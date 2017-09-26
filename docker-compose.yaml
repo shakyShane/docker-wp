@@ -9,6 +9,8 @@ services:
       - ./.env.example:/var/www/bedrock/.env
       - ./web/app/themes:/var/www/bedrock/web/app/themes
       - ./config:/var/www/bedrock/config
+    depends_on:
+      - database
 
   nginx:
     image: nginx:1.12-alpine
@@ -21,7 +23,7 @@ services:
 
   # The Database
   database:
-    image: mysql:5.6
+    image: mysql:5.7
     volumes:
       - ./db:/var/lib/mysql
     environment:
