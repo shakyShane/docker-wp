@@ -16,7 +16,7 @@ services:
   php:
     build:
       context: ./
-      dockerfile: ./php/php.Dockerfile
+      dockerfile: ./php/Dockerfile
     volumes:
       - ./.env.example:/var/www/.env
       - ./web/app/themes:/var/www/web/app/themes
