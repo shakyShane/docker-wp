@@ -19,13 +19,32 @@ RUN php -r "copy('https://getcomposer.org/installer', 'composer-setup.php');" \
     && php composer-setup.php \
     && php -r "unlink('composer-setup.php');"
 
+# taken from Wordpress offical fpm Dockerfile
+# https://github.com/docker-library/wordpress/blob/7d40c4237f01892bb6dbc67d1a82f5b15f807ca1/php7.0/fpm/Dockerfile
+RUN { \
+		echo 'opcache.memory_consumption=128'; \
+		echo 'opcache.interned_strings_buffer=8'; \
+		echo 'opcache.max_accelerated_files=4000'; \
+		echo 'opcache.revalidate_freq=2'; \
+		echo 'opcache.fast_shutdown=1'; \
+		echo 'opcache.enable_cli=1'; \
+	} > /usr/local/etc/php/conf.d/opcache-recommended.ini
+
+# taken from mkz71's comment on Wordpress official Docker Hub page
+# https://hub.docker.com/_/wordpress/
+RUN { \
+		echo 'file_uploads = On'; \
+		echo 'memory_limit = 256M'; \
+		echo 'upload_max_filesize = 256M'; \
+		echo 'post_max_size = 300M'; \
+		echo 'max_execution_time = 600'; \
+	} > /usr/local/etc/php/conf.d/uploads.ini
+
 COPY composer.json /var/www
 COPY composer.lock /var/www
 
 RUN php composer.phar install
 
-COPY web/index.php /var/www/web/index.php
-COPY web/wp-config.php /var/www/web/wp-config.php
 COPY web/app/mu-plugins/*.php /var/www/web/app/mu-plugins/
 
 RUN mkdir /var/www/web/app/uploads
@@ -35,6 +54,5 @@ VOLUME /var/www/web/app/mu-plugins
 VOLUME /var/www/web/app/uploads
 VOLUME /var/www/web/app/plugins
 VOLUME /var/www/web/wp
-
 
 # RUN php composer.phar create-project roots/bedrock

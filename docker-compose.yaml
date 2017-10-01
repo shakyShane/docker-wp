@@ -19,6 +19,8 @@ services:
       dockerfile: ./.docker/php/Dockerfile
     volumes:
       - ./.env.example:/var/www/.env
+      - ./web/index.php:/var/www/web/index.php
+      - ./web/wp-config.php:/var/www/web/wp-config.php
       - ./web/app/themes:/var/www/web/app/themes
       - ./web/app/languages:/var/www/web/app/languages
       - ./web/app/uploads:/var/www/web/app/uploads
