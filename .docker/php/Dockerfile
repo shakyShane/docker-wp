@@ -20,12 +20,21 @@ RUN php -r "copy('https://getcomposer.org/installer', 'composer-setup.php');" \
     && php -r "unlink('composer-setup.php');"
 
 COPY composer.json /var/www
-RUN php composer.phar install --no-dev --no-scripts
+COPY composer.lock /var/www
+
+RUN php composer.phar install
 
 COPY web/index.php /var/www/web/index.php
 COPY web/wp-config.php /var/www/web/wp-config.php
+COPY web/app/mu-plugins/*.php /var/www/web/app/mu-plugins/
 
+RUN mkdir /var/www/web/app/uploads
+RUN chown -R www-data:www-data /var/www/web/app/uploads
+
+VOLUME /var/www/web/app/mu-plugins
+VOLUME /var/www/web/app/uploads
+VOLUME /var/www/web/app/plugins
 VOLUME /var/www/web/wp
 
-# RUN php composer.phar create-project roots/bedrock
 
+# RUN php composer.phar create-project roots/bedrock
