@@ -45,14 +45,15 @@ COPY composer.lock /var/www
 
 RUN php composer.phar install
 
-COPY web/app/mu-plugins/*.php /var/www/web/app/mu-plugins/
+ARG JH_WP_DIR
+ARG JH_APP_DIR
 
-RUN mkdir /var/www/web/app/uploads
-RUN chown -R www-data:www-data /var/www/web/app/uploads
+COPY ${JH_APP_DIR}/mu-plugins/*.php /var/www/${JH_APP_DIR}/mu-plugins/
 
-VOLUME /var/www/web/app/mu-plugins
-VOLUME /var/www/web/app/uploads
-VOLUME /var/www/web/app/plugins
-VOLUME /var/www/web/wp
+RUN mkdir "/var/www/${JH_APP_DIR}/uploads"
+RUN chown -R www-data:www-data "/var/www/${JH_APP_DIR}/uploads"
 
-# RUN php composer.phar create-project roots/bedrock
+VOLUME "/var/www/${JH_APP_DIR}/mu-plugins"
+VOLUME "/var/www/${JH_APP_DIR}/uploads"
+VOLUME "/var/www/${JH_APP_DIR}/plugins"
+VOLUME "/var/www/${JH_WP_DIR}"
