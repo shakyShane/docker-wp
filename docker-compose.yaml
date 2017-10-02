@@ -22,16 +22,16 @@ services:
       - ./.env:/var/www/.env
 
       # Bedrock PHP entry points
-      - ./web/index.php:/var/www/web/index.php
-      - ./web/wp-config.php:/var/www/web/wp-config.php
+      - ./${JH_PUBLIC_DIR}/index.php:/var/www/${JH_PUBLIC_DIR}/index.php
+      - ./${JH_PUBLIC_DIR}/wp-config.php:/var/www/${JH_PUBLIC_DIR}/wp-config.php
 
       # Bedrock Config
       - ./config:/var/www/config
 
       # Any themes/languages/uploads
-      - ./web/app/themes:/var/www/web/app/themes
-      - ./web/app/languages:/var/www/web/app/languages
-      - ./web/app/uploads:/var/www/web/app/uploads
+      - ./${JH_APP_DIR}/themes:/var/www/${JH_APP_DIR}/themes
+      - ./${JH_APP_DIR}/languages:/var/www/${JH_APP_DIR}/languages
+      - ./${JH_APP_DIR}/uploads:/var/www/${JH_APP_DIR}/uploads
 
   nginx:
     build:
