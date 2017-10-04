@@ -1,0 +1,86 @@
+config:
+  envFile:
+    - .env
+tasks:
+
+  start:
+    description: |
+      Start all services. Note: this will auto-import any DB in the
+      mysql folder
+    tasks:
+      - up
+      - '@sh echo Running at $WP_HOME'
+
+  up: '@sh docker-compose up --build -d'
+  stop: '@sh docker-compose stop'
+  down: '@sh docker-compose down'
+
+  restart:
+    description: |
+      Take down all services, clean files and then restart. Note: this will re-import any
+      DB in the mysql folder
+    tasks:
+      - down
+      - clean
+      - start
+
+  composer:
+    description: |
+      <strong>Run composer commands inside the PHP container.</strong> <br><br>
+      So where you'd normally run the following commands:<br>
+      `composer require some-plugin` <br>
+      `composer remove some-plugin` <br><br>
+      You can replace them with: (note the `--` terminator) <br>
+      `cb composer -- require some-plugin`<br>
+      `cb composer -- remove some-plugin`
+    tasks:
+      - '@sh docker-compose exec php php composer.phar $CB_CLI_TRAILING'
+      - copy-after-composer
+
+  clean:
+    description: |
+      Remove `vendor`, `wp` & `plugin` files that are not tracked by git<br><br>
+      Usage:<br>
+
+      `cb clean`
+    tasks:
+      - >
+        @sh rm -rf
+        vendor
+        $JH_WP_DIR
+
+  copy-after-composer:
+    description: |
+      Copy files that could be affected by composer from the container
+      back into your local directories
+    tasks:
+      - cp:lock
+      - cp:composer-json
+      - cp:vendor
+      - cp:plugins
+
+  copy:
+    description: |
+      Copy all vendor, WP & plugin files that were installed by composer inside the
+      container back to your local machine
+    tasks:
+      - cp:*
+
+  (cp):
+    lock:
+      - >
+        @sh docker cp $(docker-compose ps -q php):/var/www/composer.lock .
+    composer-json:
+      - >
+        @sh docker cp $(docker-compose ps -q php):/var/www/composer.json .
+    vendor:
+      - >
+        @sh docker cp $(docker-compose ps -q php):/var/www/vendor/. ./vendor
+    plugins:
+      - >
+        @sh docker cp $(docker-compose ps -q php):/var/www/$JH_APP_DIR/plugins/. ./$JH_APP_DIR/plugins
+      - >
+        @sh docker cp $(docker-compose ps -q php):/var/www/$JH_APP_DIR/mu-plugins/. ./$JH_APP_DIR/mu-plugins
+    wp:
+      - >
+        @sh docker cp $(docker-compose ps -q php):/var/www/$JH_WP_DIR/. ./$JH_WP_DIR

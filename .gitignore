@@ -3,3 +3,8 @@ node_modules
 .DS_Store
 !.gitignore
 .env
+/vendor
+/web/wp
+/web/app/plugins
+/web/app/mu-plugins/*
+!/web/app/mu-plugins/*.php
